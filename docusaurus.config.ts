@@ -16,8 +16,9 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: "tectone23", // Usually your GitHub org/user name.
-  projectName: "tectone23.github.io", // Usually your repo name.
+  organizationName: "Tectone23", // Usually your GitHub org/user name.
+  projectName: "Tectone23.github.io", // Usually your repo name.
+  trailingSlash: false,
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
