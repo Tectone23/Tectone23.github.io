@@ -27,6 +27,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix: { dir: ["tectone-desktop", "main"] }
     steps:
       - name: Checkout Tectone Desktop
         uses: actions/checkout@v4
@@ -36,19 +38,29 @@ jobs:
           path: tectone-desktop
           fetch-depth: 0
 
-      - uses: actions-ecosystem/action-get-latest-tag@v1
-        id: get-latest-tag
+      - name: "Get Previous tag"
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          workingDirectory: tectone-desktop
 
       - name: Set Release Version
         run: |
-          echo "LINUX_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.linux-amd64" >> $GITHUB_ENV
-          echo "MACOS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.darwin-amd64" >> $GITHUB_ENV
-          echo "WINDOWS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.windows-amd64" >> $GITHUB_ENV
+          echo ${GITHUB_WORKSPACE}
+          echo "LINUX_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.previoustag.outputs.tag }}/tectone-desktop.${{ steps.previoustag.outputs.tag }}.linux-amd64" >> $GITHUB_ENV
+          echo "MACOS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.previoustag.outputs.tag }}/tectone-desktop.${{ steps.previoustag.outputs.tag }}.darwin-amd64" >> $GITHUB_ENV
+          echo "WINDOWS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.previoustag.outputs.tag }}/tectone-desktop.${{ steps.previoustag.outputs.tag }}.windows-amd64" >> $GITHUB_ENV
 
       - name: Checkout Tectone23.github.io
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          path: main
+          node-version: 18
+
+      - name: Build documentation
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
