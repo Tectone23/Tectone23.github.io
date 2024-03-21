@@ -29,15 +29,35 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Tectone Desktop
         uses: actions/checkout@v4
+        with:
+          repository: Tectone23/tectone-desktop
+          token: ${{ secrets.GH_PAT }} # `GH_PAT` is a secret that contains your PAT
+          path: tectone-desktop
+          fetch-depth: 0
+
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get-latest-tag
+
+      - name: Set Release Version
+        run: |
+          echo "LINUX_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.linux-amd64" >> $GITHUB_ENV
+          echo "MACOS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.darwin-amd64" >> $GITHUB_ENV
+          echo "WINDOWS_BUILD_URL=https://github.com/Tectone23/tectone-desktop/releases/download/${{ steps.get-latest-tag.outputs.tag }}/tectone-desktop.${{ steps.get-latest-tag.outputs.tag }}.windows-amd64" >> $GITHUB_ENV
+
+      - name: Checkout Tectone23.github.io
+        uses: actions/checkout@v4
+        with:
+          path: main
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: 'build'
+          path: "build"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
